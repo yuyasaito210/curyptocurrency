@@ -1,15 +1,13 @@
-import * as React from 'react';
-import OriginalViewChart from './view/originalViewChart';
+import React from 'react';
+import './App.css';
+import OriginalView from './view/originalViewChart';
 
-export class App extends React.Component {
-
-  render() {
-    return (
-      <div>
-        <OriginalViewChart />
-      </div>
-    )
-  }
+function App() {
+  return (
+    <div>
+     <OriginalView/>
+    </div>
+  );
 }
 
 export default App;

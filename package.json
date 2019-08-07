@@ -1,13 +1,13 @@
 {
-  "name": "curyptocurrency",
+  "name": "curyptocurrncy",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@syncfusion/ej2-react-charts": "^17.2.36",
+    "d3-dsv": "^1.1.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-mosaic-component": "^3.2.0",
-    "react-scripts": "3.0.1"
+    "react-scripts": "3.0.1",
+    "react-stockcharts": "^0.7.8"
   },
   "scripts": {
     "start": "react-scripts start",
