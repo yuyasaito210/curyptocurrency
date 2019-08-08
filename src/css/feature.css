@@ -1,0 +1,108 @@
+.feature {
+  padding: 50px;
+  color: #000 !important;
+}
+
+.feature section {
+  columns: 2;
+  margin-bottom: 100px;
+}
+
+.feature section > div {
+  padding: 50px;
+  flex-grow: 1;
+  width: 80%;
+  margin: auto;
+}
+
+.feature section > div h1 {
+  font-weight: 100;
+  color: #333;
+  padding: 2rem 0;
+}
+
+.feature section > div p {
+  text-align: justify;
+  color: #000;
+  font-size: 0.8rem;
+  line-height: 1rem;
+}
+
+.feature section > div img {
+  width: 100%;
+}
+
+.fbuttons {
+  width: 80%;
+  padding: 1rem;
+  color: rgb(51, 51, 51);
+  border: 1px solid rgb(51, 51, 51);
+  text-align: center;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 100ms;
+}
+
+.fbuttons:hover {
+  color: rgb(240, 185, 11);
+  border-color: rgb(240, 185, 11);
+}
+
+.btns {
+  display: flex;
+}
+
+.btns .fbuttons {
+  width: calc(50% - 1rem);
+  margin: 0.5rem;
+}
+
+.ficons {
+  display: flex !important;
+}
+
+.icons {
+  width: 3rem;
+  height: 3rem;
+}
+
+.btn-text {
+  text-align: left;
+  font-size: 1rem;
+}
+
+.support-col {
+  padding: 1rem;
+  text-align: center;
+  /* margin-left: 100px; */
+}
+
+.support-col img {
+  width: 40%;
+}
+
+.support-col h4 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #222;
+}
+
+.support-col p {
+  color: #333;
+  line-height: 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.container-ui {
+  width: 90%;
+  margin: auto;
+}
+
+.container-ui h2 {
+  font-weight: 100;
+  font-size: 56px;
+  margin: 150px 0;
+}

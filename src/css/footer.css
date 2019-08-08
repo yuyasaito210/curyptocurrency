@@ -1,0 +1,42 @@
+.footer {
+  background-color: #000;
+}
+
+.footer_content {
+  text-align: center;
+  padding: 100px 0px;
+}
+
+.dropdown-button {
+  background-color: #fbda3c;
+}
+
+.content_AboutUS {
+  color: rgb(255, 255, 255);
+  padding: 0px 0px 13px;
+}
+
+.content_link {
+  color: #848e9c;
+}
+.footer_button {
+  background-color: #fbda3c;
+  margin-right: 44px;
+}
+
+.content_footerdata {
+  padding: 60px 111px 0px;
+}
+
+.btn-f,
+.btn-primary {
+  background-color: #eebc23 !important;
+  box-shadow: 0 5px 8px #eebc23 !important;
+  color: #12161c;
+  padding: 0.7rem 3rem !important;
+}
+
+.btn-f:hover,
+.btn-f:active {
+  background-color: lighten(#eebc23) !important;
+}
