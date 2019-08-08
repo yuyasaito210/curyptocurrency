@@ -4,7 +4,7 @@
 }
 
 .feature section {
-  columns: 2;
+  display: flex;
   margin-bottom: 100px;
 }
 
@@ -57,6 +57,7 @@
 .btns .fbuttons {
   width: calc(50% - 1rem);
   margin: 0.5rem;
+  padding: 0.2rem 1rem;
 }
 
 .ficons {
@@ -66,6 +67,7 @@
 .icons {
   width: 3rem;
   height: 3rem;
+  margin-right: 1rem;
 }
 
 .btn-text {

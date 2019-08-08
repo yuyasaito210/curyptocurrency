@@ -2,6 +2,7 @@ import React from "react";
 import { MDBDataTable, MDBTableHead, MDBTableBody } from "mdbreact";
 import { Container, Tabs, Tab, ThemeProvider } from "react-bootstrap";
 import { IoIosStarOutline, IoIosStar } from "react-icons/io";
+// import '../css/datatables.cs'
 
 class DatatablePage extends React.Component {
   state = {
@@ -632,9 +633,17 @@ class DatatablePage extends React.Component {
     newData.rows = newData.rows.map((elem, index) => {
       return {
         favourite: elem.fav ? (
-          <IoIosStar id={"T-" + index} />
+          <IoIosStar
+            style={{ color: "#ffbb33", "font-size": "1.2rem" }}
+            className="star"
+            id={"T-" + index}
+          />
         ) : (
-          <IoIosStarOutline id={"T-" + index} />
+          <IoIosStarOutline
+            style={{ color: "#ffbb33", "font-size": "1.2rem" }}
+            className="star"
+            id={"T-" + index}
+          />
         ),
         ...elem
       };
