@@ -1,15 +1,13 @@
-import * as React from 'react';
-import OriginalViewChart from './view/originalViewChart';
+import React from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import HomePage from "./view/home";
 
-export class App extends React.Component {
-
+export default class App extends React.Component {
   render() {
     return (
       <div>
-        <OriginalViewChart />
+        <HomePage />
       </div>
-    )
+    );
   }
 }
-
-export default App;
