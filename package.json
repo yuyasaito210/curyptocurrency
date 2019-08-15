@@ -1,16 +1,21 @@
 {
-  "name": "binami",
+  "name": "crypto-exchange",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "bootstrap": "^4.3.1",
-    "mdbreact": "^4.19.0",
-    "react": "^16.8.6",
-    "react-bootstrap": "^1.0.0-beta.10",
-    "react-dom": "^16.8.6",
-    "react-icons": "^3.7.0",
-    "react-scripts": "3.0.1",
-    "semantic-ui-react": "^0.87.3"
+    "@blueprintjs/core": "^3.18.0",
+    "@blueprintjs/icons": "^3.10.0",
+    "@types/jest": "24.0.17",
+    "@types/node": "12.7.1",
+    "@types/react": "16.9.1",
+    "@types/react-dom": "16.8.5",
+    "d3": "^5.9.7",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-mosaic-component": "^3.2.0",
+    "react-scripts": "3.1.1",
+    "react-stockcharts": "^0.7.8",
+    "typescript": "3.5.3"
   },
   "scripts": {
     "start": "react-scripts start",
