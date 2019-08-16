@@ -33,6 +33,7 @@ const Dashboard: React.FC = () => {
                         first: 'b',
                         second: 'c',
                     },
+                    splitPercentage: 80,
                 }}
             />
         </div>

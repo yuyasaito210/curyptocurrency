@@ -6,3 +6,10 @@ body,
   margin: 0;
 }
 
+.bp3-dark {
+  background-color: #00152c;
+}
+
+.mosaic.mosaic-blueprint-theme.bp3-dark .mosaic-window .mosaic-window-body, .mosaic.mosaic-blueprint-theme.bp3-dark .mosaic-preview .mosaic-window-body {
+  background: #00152c !important;
+}

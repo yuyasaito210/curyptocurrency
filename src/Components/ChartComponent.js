@@ -4,6 +4,7 @@ import Chart from './Chart';
 import { getData } from "../utils"
 
 import { TypeChooser } from "react-stockcharts/lib/helper";
+import ChartWrapper from './ChartWrapper';
 
 class ChartComponent extends React.Component {
 	componentDidMount() {
@@ -18,7 +19,7 @@ class ChartComponent extends React.Component {
 		return (
 			
 			<TypeChooser>
-				{type => <Chart type={type} data={this.state.data} />}
+				{type => <ChartWrapper type={type}  data={this.state.data} />}
 			</TypeChooser>
 		)
 	}

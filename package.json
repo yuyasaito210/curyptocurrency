@@ -15,6 +15,7 @@
     "react-mosaic-component": "^3.2.0",
     "react-scripts": "3.1.1",
     "react-stockcharts": "^0.7.8",
+    "react-use-dimensions": "^1.2.1",
     "typescript": "3.5.3"
   },
   "scripts": {

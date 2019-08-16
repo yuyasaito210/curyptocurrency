@@ -2,58 +2,34 @@
 import React from "react";
 import PropTypes from "prop-types";
 
+
 import { format } from "d3-format";
 import { timeFormat } from "d3-time-format";
 
 import { ChartCanvas, Chart } from "react-stockcharts";
 import {
 	BarSeries,
-	AreaSeries,
 	CandlestickSeries,
-	LineSeries,
 } from "react-stockcharts/lib/series";
 import { XAxis, YAxis } from "react-stockcharts/lib/axes";
-import {
-	CrossHairCursor,
-	EdgeIndicator,
-	CurrentCoordinate,
-	MouseCoordinateX,
-	MouseCoordinateY,
-} from "react-stockcharts/lib/coordinates";
 
 import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
-import {
-	OHLCTooltip,
-	MovingAverageTooltip,
-} from "react-stockcharts/lib/tooltip";
-import { ema, heikinAshi, sma } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
 import { last } from "react-stockcharts/lib/utils";
+import { OHLCTooltip } from "react-stockcharts/lib/tooltip";
 
-class HeikinAshi extends React.Component {
+import {
+	CrossHairCursor,
+	MouseCoordinateX,
+	MouseCoordinateY
+} from "react-stockcharts/lib/coordinates";
+import ToolTip from "./ToolTip";
+
+
+class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 	render() {
-		const ha = heikinAshi();
-		const ema20 = ema()
-			.id(0)
-			.options({ windowSize: 20 })
-			.merge((d, c) => { d.ema20 = c; })
-			.accessor(d => d.ema20);
-
-		const ema50 = ema()
-			.id(2)
-			.options({ windowSize: 50 })
-			.merge((d, c) => { d.ema50 = c; })
-			.accessor(d => d.ema50);
-
-		const smaVolume50 = sma()
-			.id(3)
-			.options({ windowSize: 50, sourcePath: "volume" })
-			.merge((d, c) => { d.smaVolume50 = c; })
-			.accessor(d => d.smaVolume50);
-
 		const { type, data: initialData, width, ratio } = this.props;
-
-		const calculatedData = smaVolume50(ema50(ema20(ha(initialData))));
+		const { gridProps, seriesType } = this.props;
 		const xScaleProvider = discontinuousTimeScaleProvider
 			.inputDateAccessor(d => d.date);
 		const {
@@ -61,17 +37,37 @@ class HeikinAshi extends React.Component {
 			xScale,
 			xAccessor,
 			displayXAccessor,
-		} = xScaleProvider(calculatedData);
+		} = xScaleProvider(initialData);
 
 		const start = xAccessor(last(data));
-		const end = xAccessor(data[Math.max(0, data.length - 150)]);
+		const end = xAccessor(data[Math.max(0, data.length - 100)]);
 		const xExtents = [start, end];
+		const margin = { left: 50, right: 50, top: 10, bottom: 30 }
 
+		const candlesAppearance = {
+			wickStroke: "#000000",
+			fill: function fill(d) {
+			  return d.close > d.open ? "rgba(0, 141, 79, 1)" : "rgba(188, 29, 62, 1)";
+			},
+			stroke: "#000000",
+			candleStrokeWidth: 1,
+			widthRatio: 0.8,
+			opacity: 1,
+		  }
+
+		  const height = 600;
+		  const gridHeight = height - margin.top - margin.bottom;
+		  const gridWidth = width - margin.left - margin.right;
+  
+		  const showGrid = true;
+		  const yGrid = showGrid ? { innerTickSize: -1 * gridWidth, tickStrokeDasharray: 'ShortDot', tickStrokeOpacity: 0.2, tickStrokeWidth: 1 } : {};
+		  const xGrid = showGrid ? { innerTickSize: -1 * gridHeight, tickStrokeDasharray: 'ShortDot', tickStrokeOpacity: 0.2, tickStrokeWidth: 1 } : {};
+	
 		return (
-			<ChartCanvas height={400}
+			<ChartCanvas height={600}
 				ratio={ratio}
 				width={width}
-				margin={{ left: 80, right: 80 , top: 10, bottom: 30 }}
+				margin={margin}
 				type={type}
 				seriesName="MSFT"
 				data={data}
@@ -80,104 +76,49 @@ class HeikinAshi extends React.Component {
 				displayXAccessor={displayXAccessor}
 				xExtents={xExtents}
 			>
-				<Chart id={1}
-					yExtents={[d => [d.high, d.low], ema20.accessor(), ema50.accessor()]}
-					padding={{ top: 10, bottom: 20 }}
-				>
-					<XAxis axisAt="bottom" orient="bottom"/>
-					<YAxis axisAt="right" orient="right" ticks={5} />
+
+				<Chart id={1} height={400} yExtents={d => [d.high, d.low]} >
+					<YAxis axisAt="right" orient="right" ticks={5} {...gridProps} {...yGrid}/>
+					<XAxis axisAt="bottom" orient="bottom" showTicks={false} {...gridProps} {...xGrid}/>
 					<MouseCoordinateY
 						at="right"
 						orient="right"
-						displayFormat={format(".1f")} />
-
-					<CandlestickSeries />
-					<LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()}/>
-					<LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()}/>
-
-					<CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
-					<CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
-
-					<EdgeIndicator itemType="last" orient="right" edgeAt="right"
-						yAccessor={ema20.accessor()} fill={ema20.fill()}/>
-					<EdgeIndicator itemType="last" orient="right" edgeAt="right"
-						yAccessor={ema50.accessor()} fill={ema50.fill()}/>
-					<EdgeIndicator itemType="last" orient="right" edgeAt="right"
-						yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
-					<EdgeIndicator itemType="first" orient="left" edgeAt="left"
-						yAccessor={ema20.accessor()} fill={ema20.fill()}/>
-					<EdgeIndicator itemType="first" orient="left" edgeAt="left"
-						yAccessor={ema50.accessor()} fill={ema50.fill()}/>
-					<EdgeIndicator itemType="first" orient="left" edgeAt="left"
-						yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
-
-					<OHLCTooltip origin={[-40, 0]}/>
-					<MovingAverageTooltip
-						onClick={e => console.log(e)}
-						origin={[-38, 15]}
-						options={[
-							{
-								yAccessor: ema20.accessor(),
-								type: "EMA",
-								stroke: ema20.stroke(),
-								windowSize: ema20.options().windowSize,
-							},
-							{
-								yAccessor: ema50.accessor(),
-								type: "EMA",
-								stroke: ema50.stroke(),
-								windowSize: ema50.options().windowSize,
-							},
-						]}
+						displayFormat={format(".2f")}
 					/>
-
+					<CandlestickSeries {...candlesAppearance}/>
+					<OHLCTooltip className="xyz" forChart={1} origin={[-40, 0]} />
+					<ToolTip />
 				</Chart>
-				<Chart id={2}
-					yExtents={[d => d.volume, smaVolume50.accessor()]}
-					height={150} origin={(w, h) => [0, h - 150]}
-				>
+				<Chart id={2} origin={(w, h) => [0, h - 150]} height={150} yExtents={d => d.volume}>
+					<XAxis axisAt="bottom" orient="bottom"/>
 					<YAxis axisAt="left" orient="left" ticks={5} tickFormat={format(".2s")}/>
 					<MouseCoordinateX
 						at="bottom"
 						orient="bottom"
-						displayFormat={timeFormat("%Y-%m-%d")} />
+						displayFormat={timeFormat("%Y-%m-%d")}
+					/>
 					<MouseCoordinateY
 						at="left"
 						orient="left"
-						displayFormat={format(".4s")} />
-
-					<BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} />
-					<AreaSeries yAccessor={smaVolume50.accessor()} stroke={smaVolume50.stroke()} fill={smaVolume50.fill()}/>
-
-					<CurrentCoordinate yAccessor={smaVolume50.accessor()} fill={smaVolume50.stroke()} />
-					<CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47" />
-
-					<EdgeIndicator itemType="first" orient="left" edgeAt="left"
-						yAccessor={d => d.volume} displayFormat={format(".4s")} fill="#0F0F0F"/>
-					<EdgeIndicator itemType="last" orient="right" edgeAt="right"
-						yAccessor={d => d.volume} displayFormat={format(".4s")} fill="#0F0F0F"/>
-					<EdgeIndicator itemType="first" orient="left" edgeAt="left"
-						yAccessor={smaVolume50.accessor()} displayFormat={format(".4s")} fill={smaVolume50.fill()}/>
-					<EdgeIndicator itemType="last" orient="right" edgeAt="right"
-						yAccessor={smaVolume50.accessor()} displayFormat={format(".4s")} fill={smaVolume50.fill()}/>
+						displayFormat={format(".4s")}
+					/>
+					<BarSeries yAccessor={d => d.volume} fill={(d) => d.close > d.open ? "#008c4f" : "#bc1d3e"} />
 				</Chart>
 				<CrossHairCursor />
 			</ChartCanvas>
 		);
 	}
 }
-
-HeikinAshi.propTypes = {
+CandleStickStockScaleChartWithVolumeBarV3.propTypes = {
 	data: PropTypes.array.isRequired,
 	width: PropTypes.number.isRequired,
 	ratio: PropTypes.number.isRequired,
 	type: PropTypes.oneOf(["svg", "hybrid"]).isRequired,
 };
 
-HeikinAshi.defaultProps = {
+CandleStickStockScaleChartWithVolumeBarV3.defaultProps = {
 	type: "svg",
 };
+CandleStickStockScaleChartWithVolumeBarV3 = fitWidth(CandleStickStockScaleChartWithVolumeBarV3);
 
-HeikinAshi = fitWidth(HeikinAshi);
-
-export default HeikinAshi;
+export default CandleStickStockScaleChartWithVolumeBarV3;
