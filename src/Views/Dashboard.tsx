@@ -35,12 +35,34 @@ class Dashboard extends React.Component<Props, State> {
     ELEMENT_MAP: { [viewId: string]: JSX.Element } = {
         a: <div>
             <Nav variant="tabs" defaultActiveKey="link-1">
+                <div className="nav-div-1">
                 <Nav.Item>
                     <Nav.Link eventKey="link-1"  onClick={this.handleChartCandle}>Candle Chart</Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
                     <Nav.Link eventKey="link-2"  onClick={this.handleChartDepth}>Depth Chart</Nav.Link>
                 </Nav.Item>
+                </div>
+                <div className="nav-div-2">
+                <Nav.Item>
+                    <img src={require('../assets/images/capital-t.png')} alt="icon" />
+                </Nav.Item>
+                <Nav.Item>
+                    <img src={require('../assets/images/cursor.png')} alt="icon" />
+                </Nav.Item>
+                <Nav.Item>
+                    <img src={require('../assets/images/pitchfork.png')} alt="icon"/>
+                </Nav.Item>
+                <Nav.Item>
+                    <img src={require('../assets/images/settings.png')} alt="icon"/>
+                </Nav.Item>
+                <Nav.Item>
+                    <img src={require('../assets/images/photo-camera.png')} alt="icon"/>
+                </Nav.Item>
+                <Nav.Item>
+                    <img src={require('../assets/images/full-size.png')} alt="icon" />
+                </Nav.Item>
+                </div>
             </Nav>
             <ChartComponent /> 
           </div>,
@@ -50,16 +72,38 @@ class Dashboard extends React.Component<Props, State> {
 
     ELEMENT_MAP_DEPTH: { [viewId: string]: JSX.Element } = {
         a: <div>
-            <Nav variant="tabs" defaultActiveKey="link-1">
-                <Nav.Item>
-                    <Nav.Link eventKey="link-1"  onClick={this.handleChartCandle}>Candle Chart</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link eventKey="link-2"  onClick={this.handleChartDepth}>Depth Chart</Nav.Link>
-                </Nav.Item>
-            </Nav>
-            <h1>Depth Chart</h1>
-          </div>,
+        <Nav variant="tabs" defaultActiveKey="link-1">
+            <div className="nav-div-1">
+            <Nav.Item>
+                <Nav.Link eventKey="link-1"  onClick={this.handleChartCandle}>Candle Chart</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+                <Nav.Link eventKey="link-2"  onClick={this.handleChartDepth}>Depth Chart</Nav.Link>
+            </Nav.Item>
+            </div>
+            <div className="nav-div-2">
+            <Nav.Item>
+                <img src={require('../assets/images/capital-t.png')} alt="icon" />
+            </Nav.Item>
+            <Nav.Item>
+                <img src={require('../assets/images/cursor.png')} alt="icon" />
+            </Nav.Item>
+            <Nav.Item>
+                <img src={require('../assets/images/pitchfork.png')} alt="icon"/>
+            </Nav.Item>
+            <Nav.Item>
+                <img src={require('../assets/images/settings.png')} alt="icon"/>
+            </Nav.Item>
+            <Nav.Item>
+                <img src={require('../assets/images/photo-camera.png')} alt="icon"/>
+            </Nav.Item>
+            <Nav.Item>
+                <img src={require('../assets/images/full-size.png')} alt="icon" />
+            </Nav.Item>
+            </div>
+        </Nav>
+        <ChartComponent /> 
+      </div>,
         b: <div>Top Right Window</div>,
         c: <div>Bottom Right Window</div>,
     };

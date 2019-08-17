@@ -13,3 +13,21 @@ body,
 .mosaic.mosaic-blueprint-theme.bp3-dark .mosaic-window .mosaic-window-body, .mosaic.mosaic-blueprint-theme.bp3-dark .mosaic-preview .mosaic-window-body {
   background: #00152c !important;
 }
+
+.nav {
+  justify-content: space-between;
+}
+
+.nav-div-1{
+  display: flex
+}
+
+.nav-div-2{
+  display: flex;
+  margin-top: 10px
+}
+
+.nav-div-2 img{
+  margin-right: 12px;
+  height: 20px;
+}
