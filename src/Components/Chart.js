@@ -24,12 +24,12 @@ import {
 	MouseCoordinateY
 } from "react-stockcharts/lib/coordinates";
 import ToolTip from "./ToolTip";
-
+import '../css/chart.css'
 
 class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 	render() {
 		const { type, data: initialData, width, ratio } = this.props;
-		const { gridProps, seriesType } = this.props;
+		const { gridProps } = this.props;
 		const xScaleProvider = discontinuousTimeScaleProvider
 			.inputDateAccessor(d => d.date);
 		const {
@@ -55,7 +55,7 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 			opacity: 1,
 		  }
 
-		  const height = 600;
+		  const height = 500;
 		  const gridHeight = height - margin.top - margin.bottom;
 		  const gridWidth = width - margin.left - margin.right;
   
@@ -64,7 +64,7 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 		  const xGrid = showGrid ? { innerTickSize: -1 * gridHeight, tickStrokeDasharray: 'ShortDot', tickStrokeOpacity: 0.2, tickStrokeWidth: 1 } : {};
 	
 		return (
-			<ChartCanvas height={600}
+			<ChartCanvas height={500}
 				ratio={ratio}
 				width={width}
 				margin={margin}

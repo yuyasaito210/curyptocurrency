@@ -1,29 +1,93 @@
-import React from 'react';
+import * as React from 'react';
 import '../css/dashboard.css';
 import { Mosaic, MosaicWindow } from 'react-mosaic-component';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import '../../node_modules/react-mosaic-component/react-mosaic-component.css'
 import ChartComponent from '../Components/ChartComponent'
-
+import { Nav } from 'react-bootstrap'
+ 
 export type ViewId = 'a' | 'b' | 'c' | 'new';
 
-const ELEMENT_MAP: { [viewId: string]: JSX.Element } = {
-    a: <ChartComponent />,
-    b: <div>Top Right Window</div>,
-    c: <div>Bottom Right Window</div>,
+interface Props {}
+
+interface State {
+  chartSwitch: boolean;
 };
 
-const Dashboard: React.FC = () => {
-    return (
 
-        <div id="app">
-            <Mosaic<string> className="mosaic-blueprint-theme mosaic mosaic-drop-target bp3-dark"
+class Dashboard extends React.Component<Props, State> {
+    state = {
+        chartSwitch : false,
+    }
+
+    handleChartCandle = () => {
+        this.setState({
+            chartSwitch : false
+        })
+    }
+    handleChartDepth = () => {
+        this.setState({
+            chartSwitch : true
+        })
+    }
+
+    ELEMENT_MAP: { [viewId: string]: JSX.Element } = {
+        a: <div>
+            <Nav variant="tabs" defaultActiveKey="link-1">
+                <Nav.Item>
+                    <Nav.Link eventKey="link-1"  onClick={this.handleChartCandle}>Candle Chart</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link eventKey="link-2"  onClick={this.handleChartDepth}>Depth Chart</Nav.Link>
+                </Nav.Item>
+            </Nav>
+            <ChartComponent /> 
+          </div>,
+        b: <div>Top Right Window</div>,
+        c: <div>Bottom Right Window</div>,
+    };
+
+    ELEMENT_MAP_DEPTH: { [viewId: string]: JSX.Element } = {
+        a: <div>
+            <Nav variant="tabs" defaultActiveKey="link-1">
+                <Nav.Item>
+                    <Nav.Link eventKey="link-1"  onClick={this.handleChartCandle}>Candle Chart</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link eventKey="link-2"  onClick={this.handleChartDepth}>Depth Chart</Nav.Link>
+                </Nav.Item>
+            </Nav>
+            <h1>Depth Chart</h1>
+          </div>,
+        b: <div>Top Right Window</div>,
+        c: <div>Bottom Right Window</div>,
+    };
+    render() {
+        return (
+            <div id="app">
+            {this.state.chartSwitch === false ? <Mosaic<string> className="mosaic-blueprint-theme mosaic mosaic-drop-target bp3-dark"
+                    renderTile={(id, path) => (
+                        <MosaicWindow path={path} createNode={() => 'new'} title="">
+                            {this.ELEMENT_MAP[id]}
+                        </MosaicWindow>
+    
+                    )}
+                    initialValue={{
+                        direction: 'row',
+                        first: 'a',
+                        second: {
+                            direction: 'column',
+                            first: 'b',
+                            second: 'c',
+                        },
+                        splitPercentage: 80,
+                    }}
+                /> : <Mosaic<string> className="mosaic-blueprint-theme mosaic mosaic-drop-target bp3-dark"
                 renderTile={(id, path) => (
-                    <MosaicWindow path={path} createNode={() => 'new'} title="1">
-                        {ELEMENT_MAP[id]}
+                    <MosaicWindow path={path} createNode={() => 'new'} title="">
+                        {this.ELEMENT_MAP_DEPTH[id]}
                     </MosaicWindow>
-
                 )}
                 initialValue={{
                     direction: 'row',
@@ -35,9 +99,11 @@ const Dashboard: React.FC = () => {
                     },
                     splitPercentage: 80,
                 }}
-            />
-        </div>
-    );
+            />}
+                
+            </div>
+        );
+    }
 }
 
 export default Dashboard;
