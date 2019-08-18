@@ -7,116 +7,123 @@ import '../../node_modules/react-mosaic-component/react-mosaic-component.css'
 import ChartComponent from '../Components/ChartComponent'
 import { Nav } from 'react-bootstrap'
 import DepthChart from '../Components/DepthChart';
- 
+
 export type ViewId = 'a' | 'b' | 'c' | 'new';
 
-interface Props {}
+interface Props { }
 
 interface State {
-  chartSwitch: boolean;
+    chartSwitch: boolean;
 };
 
 
 class Dashboard extends React.Component<Props, State> {
     state = {
-        chartSwitch : false,
+        chartSwitch: false,
     }
 
     handleChartCandle = () => {
         this.setState({
-            chartSwitch : false
+            chartSwitch: false
         })
     }
     handleChartDepth = () => {
         this.setState({
-            chartSwitch : true
+            chartSwitch: true
         })
+    }
+    openFullscreen = () => {
+        let elem = document.getElementById('app')
+        if (elem != null) {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            }
+        }
     }
 
     ELEMENT_MAP: { [viewId: string]: JSX.Element } = {
         a: <div>
             <Nav variant="tabs" defaultActiveKey="link-1">
                 <div className="nav-div-1">
-                <Nav.Item>
-                    <Nav.Link eventKey="link-1"  onClick={this.handleChartCandle}>Candle Chart</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link eventKey="link-2"  onClick={this.handleChartDepth}>Depth Chart</Nav.Link>
-                </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="link-1" onClick={this.handleChartCandle}>Candle Chart</Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="link-2" onClick={this.handleChartDepth}>Depth Chart</Nav.Link>
+                    </Nav.Item>
                 </div>
                 <div className="nav-div-2">
-                <Nav.Item>
-                    <img src={require('../assets/images/capital-t.png')} alt="icon" />
-                </Nav.Item>
-                <Nav.Item>
-                    <img src={require('../assets/images/cursor.png')} alt="icon" />
-                </Nav.Item>
-                <Nav.Item>
-                    <img src={require('../assets/images/pitchfork.png')} alt="icon"/>
-                </Nav.Item>
-                <Nav.Item>
-                    <img src={require('../assets/images/settings.png')} alt="icon"/>
-                </Nav.Item>
-                <Nav.Item>
-                    <img src={require('../assets/images/photo-camera.png')} alt="icon"/>
-                </Nav.Item>
-                <Nav.Item>
-                    <img src={require('../assets/images/full-size.png')} alt="icon" />
-                </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link><img src={require('../assets/images/capital-t.png')} alt="icon" /></Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link><img src={require('../assets/images/cursor.png')} alt="icon" /></Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link><img src={require('../assets/images/pitchfork.png')} alt="icon" /></Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link><img src={require('../assets/images/settings.png')} alt="icon" /></Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link><img src={require('../assets/images/photo-camera.png')} alt="icon" /></Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link onClick={this.openFullscreen}><img src={require('../assets/images/full-size.png')} alt="icon" /></Nav.Link>
+                    </Nav.Item>
                 </div>
             </Nav>
-            <ChartComponent /> 
-          </div>,
+            <ChartComponent />
+        </div>,
         b: <div>Top Right Window</div>,
         c: <div>Bottom Right Window</div>,
     };
 
     ELEMENT_MAP_DEPTH: { [viewId: string]: JSX.Element } = {
         a: <div>
-        <Nav variant="tabs" defaultActiveKey="link-1">
-            <div className="nav-div-1">
-            <Nav.Item>
-                <Nav.Link eventKey="link-1"  onClick={this.handleChartCandle}>Candle Chart</Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-                <Nav.Link eventKey="link-2"  onClick={this.handleChartDepth}>Depth Chart</Nav.Link>
-            </Nav.Item>
-            </div>
-            <div className="nav-div-2">
-            <Nav.Item>
-                <img src={require('../assets/images/capital-t.png')} alt="icon" />
-            </Nav.Item>
-            <Nav.Item>
-                <img src={require('../assets/images/cursor.png')} alt="icon" />
-            </Nav.Item>
-            <Nav.Item>
-                <img src={require('../assets/images/pitchfork.png')} alt="icon"/>
-            </Nav.Item>
-            <Nav.Item>
-                <img src={require('../assets/images/settings.png')} alt="icon"/>
-            </Nav.Item>
-            <Nav.Item>
-                <img src={require('../assets/images/photo-camera.png')} alt="icon"/>
-            </Nav.Item>
-            <Nav.Item>
-                <img src={require('../assets/images/full-size.png')} alt="icon" />
-            </Nav.Item>
-            </div>
-        </Nav>
-        <DepthChart />
-      </div>,
+            <Nav variant="tabs" defaultActiveKey="link-1">
+                <div className="nav-div-1">
+                    <Nav.Item>
+                        <Nav.Link eventKey="link-1" onClick={this.handleChartCandle}>Candle Chart</Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="link-2" onClick={this.handleChartDepth}>Depth Chart</Nav.Link>
+                    </Nav.Item>
+                </div>
+                <div className="nav-div-2">
+                    <Nav.Item>
+                        <Nav.Link><img src={require('../assets/images/capital-t.png')} alt="icon" /></Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link><img src={require('../assets/images/cursor.png')} alt="icon" /></Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link><img src={require('../assets/images/pitchfork.png')} alt="icon" /></Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link><img src={require('../assets/images/settings.png')} alt="icon" /></Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link><img src={require('../assets/images/photo-camera.png')} alt="icon" /></Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link onClick={this.openFullscreen}><img src={require('../assets/images/full-size.png')} alt="icon" /></Nav.Link>
+                    </Nav.Item>
+                </div>
+            </Nav>
+            <DepthChart />
+        </div>,
         b: <div>Top Right Window</div>,
         c: <div>Bottom Right Window</div>,
     };
     render() {
         return (
             <div id="app">
-            {this.state.chartSwitch === false ? <Mosaic<string> className="mosaic-blueprint-theme mosaic mosaic-drop-target bp3-dark"
+                {this.state.chartSwitch === false ? <Mosaic<string> className="mosaic-blueprint-theme mosaic mosaic-drop-target bp3-dark"
                     renderTile={(id, path) => (
                         <MosaicWindow path={path} createNode={() => 'new'} title="">
                             {this.ELEMENT_MAP[id]}
                         </MosaicWindow>
-    
                     )}
                     initialValue={{
                         direction: 'row',
@@ -129,23 +136,23 @@ class Dashboard extends React.Component<Props, State> {
                         splitPercentage: 80,
                     }}
                 /> : <Mosaic<string> className="mosaic-blueprint-theme mosaic mosaic-drop-target bp3-dark"
-                renderTile={(id, path) => (
-                    <MosaicWindow path={path} createNode={() => 'new'} title="">
-                        {this.ELEMENT_MAP_DEPTH[id]}
-                    </MosaicWindow>
-                )}
-                initialValue={{
-                    direction: 'row',
-                    first: 'a',
-                    second: {
-                        direction: 'column',
-                        first: 'b',
-                        second: 'c',
-                    },
-                    splitPercentage: 80,
-                }}
-            />}
-                
+                    renderTile={(id, path) => (
+                        <MosaicWindow path={path} createNode={() => 'new'} title="">
+                            {this.ELEMENT_MAP_DEPTH[id]}
+                        </MosaicWindow>
+                    )}
+                    initialValue={{
+                        direction: 'row',
+                        first: 'a',
+                        second: {
+                            direction: 'column',
+                            first: 'b',
+                            second: 'c',
+                        },
+                        splitPercentage: 80,
+                    }}
+                    />}
+
             </div>
         );
     }
