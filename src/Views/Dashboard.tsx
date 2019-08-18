@@ -6,6 +6,7 @@ import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import '../../node_modules/react-mosaic-component/react-mosaic-component.css'
 import ChartComponent from '../Components/ChartComponent'
 import { Nav } from 'react-bootstrap'
+import DepthChart from '../Components/DepthChart';
  
 export type ViewId = 'a' | 'b' | 'c' | 'new';
 
@@ -102,7 +103,7 @@ class Dashboard extends React.Component<Props, State> {
             </Nav.Item>
             </div>
         </Nav>
-        <ChartComponent /> 
+        <DepthChart />
       </div>,
         b: <div>Top Right Window</div>,
         c: <div>Bottom Right Window</div>,

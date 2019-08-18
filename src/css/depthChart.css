@@ -1,0 +1,12 @@
+.bar-bids {
+    fill: #76af7a;
+}
+
+.bar-asks {
+    fill: #c66644;
+}
+
+.depth-chart {
+    display: inline-block;
+    float: left;
+}
