@@ -14,12 +14,14 @@ interface Props { }
 
 interface State {
     chartSwitch: boolean;
+    drawTrendLine: boolean
 };
 
 
 class Dashboard extends React.Component<Props, State> {
     state = {
         chartSwitch: false,
+        drawTrendLine: false
     }
 
     handleChartCandle = () => {
@@ -32,15 +34,7 @@ class Dashboard extends React.Component<Props, State> {
             chartSwitch: true
         })
     }
-    openFullscreen = () => {
-        let elem = document.getElementById('app')
-        if (elem != null) {
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
-            }
-        }
-    }
-
+    
     ELEMENT_MAP: { [viewId: string]: JSX.Element } = {
         a: <div>
             <Nav variant="tabs" defaultActiveKey="link-1">
@@ -52,7 +46,10 @@ class Dashboard extends React.Component<Props, State> {
                         <Nav.Link eventKey="link-2" onClick={this.handleChartDepth}>Depth Chart</Nav.Link>
                     </Nav.Item>
                 </div>
-                <div className="nav-div-2">
+                {/* <div className="nav-div-2">
+                    <Nav.Item>
+                        <Nav.Link><img src={require('../assets/images/line-chart.png')} alt="icon" /></Nav.Link>
+                    </Nav.Item>
                     <Nav.Item>
                         <Nav.Link><img src={require('../assets/images/capital-t.png')} alt="icon" /></Nav.Link>
                     </Nav.Item>
@@ -71,7 +68,7 @@ class Dashboard extends React.Component<Props, State> {
                     <Nav.Item>
                         <Nav.Link onClick={this.openFullscreen}><img src={require('../assets/images/full-size.png')} alt="icon" /></Nav.Link>
                     </Nav.Item>
-                </div>
+                </div> */}
             </Nav>
             <ChartComponent />
         </div>,
@@ -90,7 +87,7 @@ class Dashboard extends React.Component<Props, State> {
                         <Nav.Link eventKey="link-2" onClick={this.handleChartDepth}>Depth Chart</Nav.Link>
                     </Nav.Item>
                 </div>
-                <div className="nav-div-2">
+                {/* <div className="nav-div-2">
                     <Nav.Item>
                         <Nav.Link><img src={require('../assets/images/capital-t.png')} alt="icon" /></Nav.Link>
                     </Nav.Item>
@@ -109,7 +106,7 @@ class Dashboard extends React.Component<Props, State> {
                     <Nav.Item>
                         <Nav.Link onClick={this.openFullscreen}><img src={require('../assets/images/full-size.png')} alt="icon" /></Nav.Link>
                     </Nav.Item>
-                </div>
+                </div> */}
             </Nav>
             <DepthChart />
         </div>,
@@ -117,7 +114,7 @@ class Dashboard extends React.Component<Props, State> {
         c: <div>Bottom Right Window</div>,
     };
     render() {
-        return (
+        return ( 
             <div id="app">
                 {this.state.chartSwitch === false ? <Mosaic<string> className="mosaic-blueprint-theme mosaic mosaic-drop-target bp3-dark"
                     renderTile={(id, path) => (

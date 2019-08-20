@@ -24,7 +24,9 @@ body,
 
 .nav-div-2{
   display: flex;
-  margin-top: 5px
+  justify-content: flex-end;
+  margin-top: -38px;
+  margin-bottom: 5px;
 }
 
 .nav-div-2 img{
