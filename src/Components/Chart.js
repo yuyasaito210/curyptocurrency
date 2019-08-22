@@ -6,18 +6,21 @@ import PropTypes from "prop-types";
 import { format } from "d3-format";
 import { timeFormat } from "d3-time-format";
 import { Nav } from 'react-bootstrap'
+import { ema, sma } from "react-stockcharts/lib/indicator";
+
 
 import { ChartCanvas, Chart } from "react-stockcharts";
 import {
 	BarSeries,
 	CandlestickSeries,
+	LineSeries
 } from "react-stockcharts/lib/series";
 import { XAxis, YAxis } from "react-stockcharts/lib/axes";
 
 import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
 import { fitWidth } from "react-stockcharts/lib/helper";
 import { last } from "react-stockcharts/lib/utils";
-import { OHLCTooltip } from "react-stockcharts/lib/tooltip";
+import { OHLCTooltip, MovingAverageTooltip } from "react-stockcharts/lib/tooltip";
 import { FibonacciRetracement, EquidistantChannel, TrendLine, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
 
 import { toObject } from "react-stockcharts/lib/utils";
@@ -31,7 +34,8 @@ import {
 import {
 	CrossHairCursor,
 	MouseCoordinateX,
-	MouseCoordinateY
+	MouseCoordinateY,
+	CurrentCoordinate
 } from "react-stockcharts/lib/coordinates";
 
 import '../css/chart.css'
@@ -74,7 +78,7 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 			enableFib: false,
 
 			//Needs to correct
-			tempFib : false,
+			tempFib: false,
 			tempTrend: false,
 			tempChannel: false,
 
@@ -218,42 +222,6 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 			}
 		}
 	}
-	onKeyPressC(e) {
-		const keyCode = e.which;
-		console.log(keyCode);
-		switch (keyCode) {
-		case 46: { // DEL
-
-			const channels_1 = this.state.channels_1
-				.filter(each => !each.selected);
-			const channels_3 = this.state.channels_3
-				.filter(each => !each.selected);
-
-			this.canvasNode.cancelDrag();
-			this.setState({
-				channels_1,
-				channels_3,
-			});
-			break;
-		}
-		case 27: { // ESC
-			this.node.terminate();
-			this.canvasNode.cancelDrag();
-
-			this.setState({
-				enableInteractiveObject: false
-			});
-			break;
-		}
-		case 68:   // D - Draw drawing object
-		case 69: { // E - Enable drawing object
-			this.setState({
-				enableInteractiveObject: true
-			});
-			break;
-		}
-		}
-	}
 	openFullscreen = () => {
 		let elem = document.getElementById('app')
 		if (elem != null) {
@@ -289,6 +257,35 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 	render() {
 		const { type, data: initialData, width, ratio } = this.props;
 		const { gridProps } = this.props;
+
+		const ema20 = ema()
+			.options({
+				windowSize: 20, // optional will default to 10
+				sourcePath: "close", // optional will default to close as the source
+			})
+			.skipUndefined(true) // defaults to true
+			.merge((d, c) => { d.ema20 = c; }) // Required, if not provided, log a error
+			.accessor(d => d.ema20) // Required, if not provided, log an error during calculation
+			.stroke("blue"); // Optional
+
+		const sma20 = sma()
+			.options({ windowSize: 20 })
+			.merge((d, c) => { d.sma20 = c; })
+			.accessor(d => d.sma20);
+
+		const ema50 = ema()
+			.options({ windowSize: 50 })
+			.merge((d, c) => { d.ema50 = c; })
+			.accessor(d => d.ema50);
+
+		const smaVolume50 = sma()
+			.options({ windowSize: 20, sourcePath: "volume" })
+			.merge((d, c) => { d.smaVolume50 = c; })
+			.accessor(d => d.smaVolume50)
+			.stroke("#4682B4")
+			.fill("#4682B4");
+		const calculatedData = ema20(sma20(ema50(smaVolume50(initialData))));
+
 		const xScaleProvider = discontinuousTimeScaleProvider
 			.inputDateAccessor(d => d.date);
 		const {
@@ -296,7 +293,8 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 			xScale,
 			xAccessor,
 			displayXAccessor,
-		} = xScaleProvider(initialData);
+		} = xScaleProvider(calculatedData);
+
 
 		const start = xAccessor(last(data));
 		const end = xAccessor(data[Math.max(0, data.length - 100)]);
@@ -393,8 +391,12 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 					xExtents={xExtents}
 				>
 
-					<Chart id={1} height={400} yExtents={d => [d.high, d.low]} >
-						<YAxis axisAt="right" orient="right" ticks={5} {...gridProps} {...yGrid} tickStroke="#FFFFFF"/>
+					<Chart id={1} height={400}
+						yExtents={[d => [d.high, d.low], sma20.accessor(), ema20.accessor(), ema50.accessor()]}
+						padding={{ top: 10, bottom: 20 }}
+					>
+
+						<YAxis axisAt="right" orient="right" ticks={5} {...gridProps} {...yGrid} tickStroke="#FFFFFF" />
 						<XAxis axisAt="bottom" orient="bottom" showTicks={false} {...gridProps} {...xGrid} stroke="#FFFFFF" />
 						<MouseCoordinateY
 							at="right"
@@ -402,7 +404,44 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 							displayFormat={format(".2f")}
 						/>
 						<CandlestickSeries {...candlesAppearance} />
+
+						<LineSeries yAccessor={sma20.accessor()} stroke={sma20.stroke()} />
+						<LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()} />
+						<LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()} />
+						<CurrentCoordinate yAccessor={sma20.accessor()} fill={sma20.stroke()} />
+						<CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
+						<CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
+
 						<OHLCTooltip className="xyz" forChart={1} origin={[-40, 0]} />
+
+						<MovingAverageTooltip
+							onClick={e => console.log(e)}
+							origin={[-38, 15]}
+							options={[
+								{
+									yAccessor: sma20.accessor(),
+									type: "SMA",
+									stroke: sma20.stroke(),
+									windowSize: sma20.options().windowSize,
+									echo: "some echo here",
+								},
+								{
+									yAccessor: ema20.accessor(),
+									type: "EMA",
+									stroke: ema20.stroke(),
+									windowSize: ema20.options().windowSize,
+									echo: "some echo here",
+								},
+								{
+									yAccessor: ema50.accessor(),
+									type: "EMA",
+									stroke: ema50.stroke(),
+									windowSize: ema50.options().windowSize,
+									echo: "some echo here",
+								},
+							]}
+						/>
+
 						{this.state.tempTrend === true ? (<TrendLine
 							appearance={trendAppearence}
 							ref={this.saveTrendLines("Trendline", 1)}
@@ -415,7 +454,7 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 							trends={this.state.trends_1}
 							stroke='white'
 						/>) : ''}
-						
+
 						{this.state.tempChannel === true ? (<EquidistantChannel
 							ref={this.saveChannels("EquidistantChannel", 1)}
 							enabled={this.state.enableInteractiveObject}
@@ -423,7 +462,7 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 							onComplete={this.onDrawComplete}
 							channels={this.state.channels_1}
 						/>) : ''}
-						
+
 						{this.state.tempFib === true ? (<FibonacciRetracement
 							appearance={fibAppearence}
 							ref={this.saveFib("FibonacciRetracement", 1)}
@@ -431,11 +470,11 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 							retracements={this.state.retracements_1}
 							onComplete={this.onFibComplete1}
 						/>) : ''}
-						
+
 					</Chart>
 					<Chart id={2} origin={(w, h) => [0, h - 150]} height={150} yExtents={d => d.volume}>
-						<XAxis axisAt="bottom" orient="bottom" stroke="#FFFFFF" tickStroke="#FFFFFF"/>
-						<YAxis axisAt="left" orient="left" ticks={5} tickFormat={format(".2s")} tickStroke="#FFFFFF"/>
+						<XAxis axisAt="bottom" orient="bottom" stroke="#FFFFFF" tickStroke="#FFFFFF" />
+						<YAxis axisAt="left" orient="left" ticks={5} tickFormat={format(".2s")} tickStroke="#FFFFFF" />
 						<MouseCoordinateX
 							at="bottom"
 							orient="bottom"
@@ -448,8 +487,8 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 						/>
 						<BarSeries yAccessor={d => d.volume} fill={(d) => d.close > d.open ? "#008c4f" : "#bc1d3e"} />
 					</Chart>
-					<CrossHairCursor stroke="#FFFFFF"/>
-					{this.state.tempTrend === true? (<DrawingObjectSelector
+					<CrossHairCursor stroke="#FFFFFF" />
+					{this.state.tempTrend === true ? (<DrawingObjectSelector
 						enabled={!this.state.enableTrendLine}
 						getInteractiveNodes={this.getTrendLines}
 						drawingObjectMap={{
@@ -457,7 +496,7 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 						}}
 						onSelect={this.handleSelection}
 					/>) : ''}
-					
+
 					{this.state.tempChannel === true ? (<DrawingObjectSelector
 						enabled={!this.state.enableInteractiveObject}
 						getInteractiveNodes={this.getChannels}
@@ -474,7 +513,7 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 						}}
 						onSelect={this.handleSelection3}
 					/>) : ''}
-				
+
 				</ChartCanvas>
 			</div>
 		);
