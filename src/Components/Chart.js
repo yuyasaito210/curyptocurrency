@@ -6,21 +6,22 @@ import PropTypes from "prop-types";
 import { format } from "d3-format";
 import { timeFormat } from "d3-time-format";
 import { Nav } from 'react-bootstrap'
-import { ema, sma } from "react-stockcharts/lib/indicator";
+import { ema, sma, bollingerBand  } from "react-stockcharts/lib/indicator";
 
 
 import { ChartCanvas, Chart } from "react-stockcharts";
 import {
 	BarSeries,
 	CandlestickSeries,
-	LineSeries
+	LineSeries,
+	BollingerSeries
 } from "react-stockcharts/lib/series";
 import { XAxis, YAxis } from "react-stockcharts/lib/axes";
 
 import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
 import { fitWidth } from "react-stockcharts/lib/helper";
 import { last } from "react-stockcharts/lib/utils";
-import { OHLCTooltip, MovingAverageTooltip } from "react-stockcharts/lib/tooltip";
+import { OHLCTooltip, MovingAverageTooltip, BollingerBandTooltip } from "react-stockcharts/lib/tooltip";
 import { FibonacciRetracement, EquidistantChannel, TrendLine, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
 
 import { toObject } from "react-stockcharts/lib/utils";
@@ -39,6 +40,15 @@ import {
 } from "react-stockcharts/lib/coordinates";
 
 import '../css/chart.css'
+
+
+const bbStroke = {
+	top: "#964B00",
+	middle: "#000000",
+	bottom: "#964B00",
+};
+
+const bbFill = "#4682B4";
 
 class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 	constructor(props) {
@@ -278,13 +288,10 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 			.merge((d, c) => { d.ema50 = c; })
 			.accessor(d => d.ema50);
 
-		const smaVolume50 = sma()
-			.options({ windowSize: 20, sourcePath: "volume" })
-			.merge((d, c) => { d.smaVolume50 = c; })
-			.accessor(d => d.smaVolume50)
-			.stroke("#4682B4")
-			.fill("#4682B4");
-		const calculatedData = ema20(sma20(ema50(smaVolume50(initialData))));
+		const bb = bollingerBand()
+			.merge((d, c) => {d.bb = c;})
+			.accessor(d => d.bb);
+		const calculatedData = ema20(sma20(ema50(bb(initialData))));
 
 		const xScaleProvider = discontinuousTimeScaleProvider
 			.inputDateAccessor(d => d.date);
@@ -405,6 +412,10 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 						/>
 						<CandlestickSeries {...candlesAppearance} />
 
+						<BollingerSeries yAccessor={d => d.bb}
+						stroke={bbStroke}
+						fill={bbFill} />
+
 						<LineSeries yAccessor={sma20.accessor()} stroke={sma20.stroke()} />
 						<LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()} />
 						<LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()} />
@@ -441,6 +452,11 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 								},
 							]}
 						/>
+
+						<BollingerBandTooltip
+						origin={[-38, 60]}
+						yAccessor={d => d.bb}
+						options={bb.options()} />
 
 						{this.state.tempTrend === true ? (<TrendLine
 							appearance={trendAppearence}
