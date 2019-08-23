@@ -5,8 +5,8 @@ import PropTypes from "prop-types";
 
 import { format } from "d3-format";
 import { timeFormat } from "d3-time-format";
-import { Nav } from 'react-bootstrap'
-import { ema, sma, bollingerBand  } from "react-stockcharts/lib/indicator";
+import { Nav, NavDropdown, Dropdown } from 'react-bootstrap'
+import { ema, sma, bollingerBand, macd, rsi, stochasticOscillator } from "react-stockcharts/lib/indicator";
 
 
 import { ChartCanvas, Chart } from "react-stockcharts";
@@ -14,14 +14,17 @@ import {
 	BarSeries,
 	CandlestickSeries,
 	LineSeries,
-	BollingerSeries
+	BollingerSeries,
+	MACDSeries,
+	RSISeries,
+	StochasticSeries,
 } from "react-stockcharts/lib/series";
 import { XAxis, YAxis } from "react-stockcharts/lib/axes";
 
 import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
 import { fitWidth } from "react-stockcharts/lib/helper";
 import { last } from "react-stockcharts/lib/utils";
-import { OHLCTooltip, MovingAverageTooltip, BollingerBandTooltip } from "react-stockcharts/lib/tooltip";
+import { OHLCTooltip, MovingAverageTooltip, BollingerBandTooltip, MACDTooltip, RSITooltip, StochasticTooltip } from "react-stockcharts/lib/tooltip";
 import { FibonacciRetracement, EquidistantChannel, TrendLine, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
 
 import { toObject } from "react-stockcharts/lib/utils";
@@ -49,6 +52,11 @@ const bbStroke = {
 };
 
 const bbFill = "#4682B4";
+
+const stoAppearance = {
+	stroke: Object.assign({},
+		StochasticSeries.defaultProps.stroke)
+};
 
 class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 	constructor(props) {
@@ -100,6 +108,7 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 			channels_3: [],
 			retracements_1: [],
 			retracements_3: [],
+			indicator: 'rsi'
 		};
 	}
 	saveCanvasNode(node) {
@@ -264,6 +273,26 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 			tempChannel: false
 		})
 	}
+
+	selectIndicator = (value) => {
+		switch (value) {
+			case 'rsi':
+				this.setState({
+					indicator: 'rsi'
+				})
+				break;
+			case 'macd':
+				this.setState({
+					indicator: 'macd'
+				})
+				break;
+			case 'sto':
+				this.setState({
+					indicator: 'sto'
+				})
+				break;
+		}
+	}
 	render() {
 		const { type, data: initialData, width, ratio } = this.props;
 		const { gridProps } = this.props;
@@ -289,9 +318,29 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 			.accessor(d => d.ema50);
 
 		const bb = bollingerBand()
-			.merge((d, c) => {d.bb = c;})
+			.merge((d, c) => { d.bb = c; })
 			.accessor(d => d.bb);
-		const calculatedData = ema20(sma20(ema50(bb(initialData))));
+
+		const macdCalculator = macd()
+			.options({
+				fast: 12,
+				slow: 26,
+				signal: 9,
+			})
+			.merge((d, c) => { d.macd = c; })
+			.accessor(d => d.macd);
+
+		const rsiCalculator = rsi()
+			.options({ windowSize: 14 })
+			.merge((d, c) => { d.rsi = c; })
+			.accessor(d => d.rsi)
+
+		const fullSTO = stochasticOscillator()
+			.options({ windowSize: 14, kWindowSize: 3, dWindowSize: 4 })
+			.merge((d, c) => { d.fullSTO = c; })
+			.accessor(d => d.fullSTO);
+
+		const calculatedData = ema20(sma20(ema50(bb(macdCalculator(rsiCalculator(fullSTO(initialData)))))));
 
 		const xScaleProvider = discontinuousTimeScaleProvider
 			.inputDateAccessor(d => d.date);
@@ -346,6 +395,26 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 			strokeWidth: 1
 		}
 
+		const macdAppearance = {
+			stroke: {
+				macd: "#FF0000",
+				signal: "#00F300",
+			},
+			fill: {
+				divergence: "#fe2a05a3"
+			},
+		}
+
+		const mouseEdgeAppearance = {
+			textFill: "#542605",
+			stroke: "#05233B",
+			strokeOpacity: 1,
+			strokeWidth: 3,
+			arrowWidth: 5,
+			fill: "#BCDEFA",
+		};
+
+
 		const height = 500;
 		const gridHeight = height - margin.top - margin.bottom;
 		const gridWidth = width - margin.left - margin.right;
@@ -357,6 +426,11 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 		return (
 			<div>
 				<div className="nav-div-2">
+					<NavDropdown title="Indicators">
+						<NavDropdown.Item onClick={() => { this.selectIndicator('rsi') }}>RSI</NavDropdown.Item>
+						<NavDropdown.Item onClick={() => { this.selectIndicator('macd') }}>MACD</NavDropdown.Item>
+						<NavDropdown.Item onClick={() => { this.selectIndicator('sto') }}>Stochastic Oscillator</NavDropdown.Item>
+					</NavDropdown>
 					<Nav.Item>
 						<Nav.Link onClick={this.drawFib}><img src={require('../assets/images/fib.png')} alt="icon" /></Nav.Link>
 					</Nav.Item>
@@ -398,7 +472,7 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 					xExtents={xExtents}
 				>
 
-					<Chart id={1} height={400}
+					<Chart id={1} height={300}
 						yExtents={[d => [d.high, d.low], sma20.accessor(), ema20.accessor(), ema50.accessor()]}
 						padding={{ top: 10, bottom: 20 }}
 					>
@@ -413,8 +487,8 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 						<CandlestickSeries {...candlesAppearance} />
 
 						<BollingerSeries yAccessor={d => d.bb}
-						stroke={bbStroke}
-						fill={bbFill} />
+							stroke={bbStroke}
+							fill={bbFill} />
 
 						<LineSeries yAccessor={sma20.accessor()} stroke={sma20.stroke()} />
 						<LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()} />
@@ -454,9 +528,9 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 						/>
 
 						<BollingerBandTooltip
-						origin={[-38, 60]}
-						yAccessor={d => d.bb}
-						options={bb.options()} />
+							origin={[-38, 60]}
+							yAccessor={d => d.bb}
+							options={bb.options()} />
 
 						{this.state.tempTrend === true ? (<TrendLine
 							appearance={trendAppearence}
@@ -488,7 +562,7 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 						/>) : ''}
 
 					</Chart>
-					<Chart id={2} origin={(w, h) => [0, h - 150]} height={150} yExtents={d => d.volume}>
+					{/*<Chart id={2} origin={(w, h) => [0, h - 150]} height={150} yExtents={d => d.volume}>
 						<XAxis axisAt="bottom" orient="bottom" stroke="#FFFFFF" tickStroke="#FFFFFF" />
 						<YAxis axisAt="left" orient="left" ticks={5} tickFormat={format(".2s")} tickStroke="#FFFFFF" />
 						<MouseCoordinateX
@@ -502,7 +576,92 @@ class CandleStickStockScaleChartWithVolumeBarV3 extends React.Component {
 							displayFormat={format(".4s")}
 						/>
 						<BarSeries yAccessor={d => d.volume} fill={(d) => d.close > d.open ? "#008c4f" : "#bc1d3e"} />
-					</Chart>
+						</Chart>*/}
+					{this.state.indicator === 'macd' ? (
+						<Chart id={2} height={150}
+							yExtents={macdCalculator.accessor()}
+							origin={(w, h) => [0, h - 150]} padding={{ top: 10, bottom: 10 }}
+						>
+							<XAxis axisAt="bottom" orient="bottom" stroke="#FFFFFF" tickStroke="#FFFFFF" />
+							<YAxis axisAt="right" orient="right" ticks={2} tickStroke="#FFFFFF" />
+
+							<MouseCoordinateX
+								at="bottom"
+								orient="bottom"
+								displayFormat={timeFormat("%Y-%m-%d")}
+								rectRadius={5}
+								{...mouseEdgeAppearance}
+							/>
+							<MouseCoordinateY
+								at="right"
+								orient="right"
+								displayFormat={format(".2f")}
+								{...mouseEdgeAppearance}
+							/>
+
+							<MACDSeries yAccessor={d => d.macd}
+								{...macdAppearance} />
+							<MACDTooltip
+								origin={[-38, 15]}
+								yAccessor={d => d.macd}
+								options={macdCalculator.options()}
+								appearance={macdAppearance}
+							/>
+						</Chart>
+					) : ''}
+
+					{this.state.indicator === 'rsi' ? (
+						<Chart id={2}
+							yExtents={[0, 100]}
+							height={125} origin={(w, h) => [0, h - 150]}
+						>
+							<XAxis axisAt="bottom" orient="bottom" stroke="#FFFFFF" tickStroke="#FFFFFF" />
+							<YAxis axisAt="right"
+								orient="right"
+								tickValues={[30, 50, 70]} tickStroke="#FFFFFF" />
+							<MouseCoordinateY
+								at="right"
+								orient="right"
+								displayFormat={format(".2f")} />
+
+							<RSISeries yAccessor={d => d.rsi} />
+
+							<RSITooltip origin={[-38, 15]}
+								yAccessor={d => d.rsi}
+								options={rsiCalculator.options()} />
+						</Chart>
+					) : ''}
+
+					{this.state.indicator === 'sto' ? (
+						<Chart id={5}
+							yExtents={[0, 100]}
+							height={125} origin={(w, h) => [0, h - 125]} padding={{ top: 10, bottom: 10 }}
+						>
+							<XAxis axisAt="bottom" orient="bottom" {...xGrid} stroke="#FFFFFF" tickStroke="#FFFFFF" />
+							<YAxis axisAt="right" orient="right"
+								tickValues={[20, 50, 80]} tickStroke="#FFFFFF" />
+
+							<MouseCoordinateX
+								at="bottom"
+								orient="bottom"
+								displayFormat={timeFormat("%Y-%m-%d")} />
+							<MouseCoordinateY
+								at="right"
+								orient="right"
+								displayFormat={format(".2f")} />
+							<StochasticSeries
+								yAccessor={d => d.fullSTO}
+								{...stoAppearance} />
+
+							<StochasticTooltip
+								origin={[-38, -6]}
+								yAccessor={d => d.fullSTO}
+								options={fullSTO.options()}
+								appearance={stoAppearance}
+								label="Full STO" />
+						</Chart>
+					) : ''}
+
 					<CrossHairCursor stroke="#FFFFFF" />
 					{this.state.tempTrend === true ? (<DrawingObjectSelector
 						enabled={!this.state.enableTrendLine}
